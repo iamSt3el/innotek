@@ -65,7 +65,7 @@ def llm(prompt):
 
 def action_agent(user_question, hist):
     prompt_template = """
-    You are an AI legal conversational assistant to provide information related to law, legal matters, and criminal issues. 
+    You are an AI legal conversational assistant JURIS to provide information related to law, legal matters, and criminal issues related to india. 
 
 For each user query, you have three options:
 
@@ -120,7 +120,7 @@ def google_search(user_question, hist):
 
 
 def user_input(user_question, hist):
-    prompt_template_1 = """You are a legal conversational AI assistant trained to provide general legal information to users within the scope of your knowledge base in a conversational manner. Your goals are:
+    prompt_template_1 = """You are a legal conversational AI assistant named JURIS trained to provide general legal information to users related to india,  within the scope of your knowledge base in a conversational manner. Your goals are:
 
                             1. Thoroughly understand each user's legal query by asking clarifying follow-up questions as needed.
 
@@ -139,15 +139,18 @@ def user_input(user_question, hist):
                             8. Access external knowledge from the internet to supplement your knowledge base when relevant.
 
                             9. Be empathetic and approachable, as legal issues can be sensitive.
+
+                            10. Also provide the source of the answere as given in the source of context part. 
                             current date: {date}
 
                             You have access to previous conversation history: {history}
+                            Source of Context: {source}
                             As well as this external context from the internet: {context}
 
                             The user's language is: {lang}
                             Their current question is: {question}
 
-                            Your role is to provide informative, detailed legal guidance to the best of your abilities while recognizing limitations. If you cannot provide a reliable answer, simply suggest rephrasing the question. Do not provide any other response if you lack the relevant knowledge."""
+                            Your role is to provide informative, detailed legal guidance to the best of your abilities while recognizing limitations with source of the context. If you cannot provide a reliable answer, simply suggest rephrasing the question. Do not provide any other response if you lack the relevant knowledge. Don't forgot to add source."""
     
     
     output = action_agent(user_question, hist)
@@ -178,7 +181,7 @@ def user_input(user_question, hist):
 
         docs = html_converter.run(data['streams'])
         print(docs['documents'][0].content)
-        prompt = prompt_template_1.format(context = (output['documents'][0].content + docs['documents'][0].content), question = user_question, history = hist, lang = "English", date = "24-April-2024") 
+        prompt = prompt_template_1.format(context = (output['documents'][0].content + docs['documents'][0].content), question = user_question, history = hist, lang = "English", date = "24-April-2024", source = output['documents'][1].meta['link'] + output['documents'][0].meta['link']) 
 
         response = llm(prompt)
         return response
